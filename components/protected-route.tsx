@@ -2,35 +2,36 @@
 
 import type React from "react"
 
-import { useAuth } from "@/contexts/auth-context"
-import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    // Si no está cargando y no hay usuario, redirigir al login
     if (!loading && !user) {
       router.push("/login")
     }
   }, [loading, user, router])
 
-  // Mostrar un indicador de carga mientras se verifica la autenticación
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+      <div className="flex items-center justify-center h-screen bg-amber-50">
+        <div className="text-center">
+          <div className="relative w-24 h-24 mx-auto mb-4">
+            <img src="/cheikys-logo.png" alt="Cheikys Pizza Logo" className="w-full h-full animate-pulse" />
+          </div>
+          <p className="text-amber-600 animate-pulse">Cargando...</p>
+        </div>
       </div>
     )
   }
 
-  // Si no hay usuario, no renderizar nada (la redirección se manejará en el useEffect)
   if (!user) {
     return null
   }
 
-  // Si hay usuario, renderizar el contenido protegido
   return <>{children}</>
 }

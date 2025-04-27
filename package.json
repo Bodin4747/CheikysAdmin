@@ -65,6 +65,7 @@
     "jspdf-autotable": "latest",
     "xlsx": "latest",
     "react-chartjs-2": "latest",
+    "firebase-admin": "latest",
     "framer-motion": "latest",
     "js-cookie": "latest"
   },

@@ -29,6 +29,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [showWelcome, setShowWelcome] = useState(true)
+  const [debugInfo, setDebugInfo] = useState<string | null>(null)
 
   // Efecto para la animación de bienvenida
   useEffect(() => {
@@ -52,20 +53,28 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     setError(null)
+    setDebugInfo(null)
 
     try {
-      await login(values.email, values.password)
+      console.log("Intentando iniciar sesión con:", values.email)
+      const user = await login(values.email, values.password)
+      console.log("Login exitoso, redirigiendo...")
       router.push("/")
     } catch (error: any) {
       console.error("Error de inicio de sesión:", error)
+
+      // Información de depuración
+      setDebugInfo(`Código: ${error.code || "desconocido"}, Mensaje: ${error.message || "No hay mensaje"}`)
 
       // Manejar diferentes tipos de errores de Firebase
       if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
         setError("Credenciales incorrectas. Por favor intenta de nuevo.")
       } else if (error.code === "auth/too-many-requests") {
         setError("Demasiados intentos fallidos. Por favor intenta más tarde.")
+      } else if (error.code === "auth/network-request-failed") {
+        setError("Error de conexión. Verifica tu conexión a internet.")
       } else {
-        setError("Ocurrió un error al iniciar sesión. Por favor intenta de nuevo.")
+        setError(`Ocurrió un error al iniciar sesión: ${error.message}`)
       }
     } finally {
       setIsLoading(false)
@@ -219,6 +228,12 @@ export default function LoginPage() {
                   <AlertDescription className="font-medium">{error}</AlertDescription>
                 </Alert>
               </motion.div>
+            )}
+
+            {debugInfo && (
+              <div className="mb-4 p-2 bg-gray-100 text-xs text-gray-700 rounded">
+                <p className="font-mono">{debugInfo}</p>
+              </div>
             )}
 
             <Form {...form}>
